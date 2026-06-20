@@ -61,9 +61,7 @@ function DashboardPage() {
       <header className="sticky top-0 z-10 bg-white border-b border-slate-200">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded bg-slate-900 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-amber-400">MJW</span>
-            </div>
+            <img src="/logo.png" alt="MJW" className="w-8 h-8 rounded-full object-cover" />
             <div className="font-serif text-base text-slate-900">
               MJW <em className="not-italic text-amber-500">Site Report</em>
             </div>
