@@ -1,0 +1,93 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Title -->
+    <mxCell id="2" value="MJW Site Report — Application Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1e293b;" vertex="1" parent="1">
+      <mxGeometry x="280" y="20" width="600" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- PWA / Service Worker -->
+    <mxCell id="3" value="&lt;b&gt;PWA / Service Worker&lt;/b&gt;&lt;br&gt;Caches all assets on install&lt;br&gt;Works with zero network signal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="430" y="80" width="300" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- Dashboard -->
+    <mxCell id="4" value="&lt;b&gt;DASHBOARD  /&lt;/b&gt;&lt;br&gt;• Start New Report button&lt;br&gt;• Continue Current Report button&lt;br&gt;• Tabs: Active | Completed | Archived&lt;br&gt;• Report cards: progress bar, stats, Open / Archive / Reopen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#3b82f6;fontSize=11;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="280" y="200" width="600" height="100" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: PWA to Dashboard -->
+    <mxCell id="5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="3" target="4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- New Report form -->
+    <mxCell id="6" value="&lt;b&gt;NEW REPORT  /new&lt;/b&gt;&lt;br&gt;① Building selector (8 buildings)&lt;br&gt;② Auto-fill site name + site code&lt;br&gt;③ Report name, planned date, due date&lt;br&gt;④ Report type dropdown&lt;br&gt;⑤ Area / Inspector name (localStorage)&lt;br&gt;&lt;br&gt;→ Writes to IndexedDB&lt;br&gt;→ Pre-loads 12 inspection areas&lt;br&gt;→ Navigates to /reports/$id" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#3b82f6;fontSize=11;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="60" y="380" width="280" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- Report Capture -->
+    <mxCell id="7" value="&lt;b&gt;REPORT CAPTURE  /reports/$id&lt;/b&gt;&lt;br&gt;Header: site code (gold) · PDF button · Finish button&lt;br&gt;Summary card: areas, progress %, needs work, repairs, photos&lt;br&gt;&lt;br&gt;Section Cards (12 default + ad hoc):&lt;br&gt;• Status: Needs Work | Acceptable | Good | In Order | N/A&lt;br&gt;• Comments (auto-save)&lt;br&gt;• Repairs required → description, priority, target date, assigned to&lt;br&gt;• Photos: camera capture + gallery upload (compressed)&lt;br&gt;• Follow-up flag · Action required&lt;br&gt;• Move up/down · Rename · Delete&lt;br&gt;&lt;br&gt;→ Finish → status = completed → back to Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#c9a24b;fontSize=11;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="620" y="360" width="470" height="240" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: Dashboard to New -->
+    <mxCell id="8" value="Start New Report" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#3b82f6;fontColor=#3b82f6;fontSize=10;" edge="1" source="4" target="6" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: Dashboard to Capture (Continue / Open) -->
+    <mxCell id="9" value="Open / Continue" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#c9a24b;fontColor=#c9a24b;fontSize=10;" edge="1" source="4" target="7" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: New to Capture -->
+    <mxCell id="10" value="Create report" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#3b82f6;fontColor=#3b82f6;fontSize=10;dashed=1;" edge="1" source="6" target="7" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: Capture back to Dashboard -->
+    <mxCell id="11" value="Finish / Back" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#22c55e;fontColor=#22c55e;fontSize=10;" edge="1" source="7" target="4" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1130" y="480" />
+          <mxPoint x="1130" y="160" />
+          <mxPoint x="580" y="160" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- IndexedDB -->
+    <mxCell id="12" value="&lt;b&gt;IndexedDB (idb) — Sole Data Store&lt;/b&gt;&lt;br&gt;stores: reports · sections · photos · photo_blobs · meta&lt;br&gt;All reads/writes are local — zero network needed" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="350" y="650" width="460" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- PDF Export -->
+    <mxCell id="13" value="&lt;b&gt;PDF Export (jsPDF + autotable)&lt;/b&gt;&lt;br&gt;blob:// URLs for photos · 100% offline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="60" y="660" width="260" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: New to DB -->
+    <mxCell id="14" value="write" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#82b366;fontColor=#82b366;fontSize=10;dashed=1;" edge="1" source="6" target="12" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: Capture to DB -->
+    <mxCell id="15" value="read / write" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#82b366;fontColor=#82b366;fontSize=10;dashed=1;" edge="1" source="7" target="12" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: Capture to PDF -->
+    <mxCell id="16" value="export" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#b85450;fontColor=#b85450;fontSize=10;" edge="1" source="7" target="13" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Arrow: Dashboard reads DB -->
+    <mxCell id="17" value="read" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#82b366;fontColor=#82b366;fontSize=10;dashed=1;" edge="1" source="4" target="12" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>
