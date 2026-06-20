@@ -238,40 +238,53 @@ function CapturePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 pb-32">
-      <header className="sticky top-0 z-10 bg-slate-900 border-b border-slate-700">
+    <div className="min-h-screen pb-32" style={{ background: "var(--bg-base)" }}>
+      <header className="sticky top-0 z-10 border-b" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
         <div className="max-w-3xl mx-auto px-2 py-2">
           <div className="flex items-center justify-between">
-            <Link to="/"><Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-800"><ChevronLeft className="w-4 h-4 mr-1" /> Reports</Button></Link>
-            <div className="flex items-center gap-1">
+            <Link to="/">
+              <button className="flex items-center gap-1 text-sm px-2 py-1.5 rounded-lg hover:opacity-80" style={{ color: "var(--text-2)" }}>
+                <ChevronLeft className="w-4 h-4" /> Reports
+              </button>
+            </Link>
+            <div className="flex items-center gap-1.5">
               <OfflineIndicator />
-              <Button variant="outline" size="sm" onClick={downloadPdf} disabled={downloading} title="Download PDF (works offline)"
-                className="border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white">
-                {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                <span className="ml-1 hidden sm:inline">PDF</span>
-              </Button>
+              <button onClick={downloadPdf} disabled={downloading} title="Download PDF (works offline)"
+                className="flex items-center gap-1 h-8 px-3 rounded-lg text-xs font-medium border transition-opacity hover:opacity-80 disabled:opacity-50"
+                style={{ background: "var(--bg-card-2)", borderColor: "var(--border)", color: "var(--text-2)" }}>
+                {downloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline ml-1">PDF</span>
+              </button>
               {report.status === "active" ? (
-                <Button size="sm" onClick={() => setFinishOpen(true)} className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold">
-                  <CheckCircle2 className="w-4 h-4 mr-1" /> Finish
-                </Button>
+                <button onClick={() => setFinishOpen(true)}
+                  className="h-8 px-3 rounded-lg text-xs font-semibold flex items-center gap-1 transition-opacity hover:opacity-90"
+                  style={{ background: "var(--accent)", color: "#fff" }}>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Finish
+                </button>
               ) : (
-                <Button size="sm" variant="outline" onClick={reopenReport} className="border-slate-600 text-slate-200 hover:bg-slate-700">Reopen</Button>
+                <button onClick={reopenReport}
+                  className="h-8 px-3 rounded-lg text-xs font-medium border transition-opacity hover:opacity-80"
+                  style={{ background: "var(--bg-card-2)", borderColor: "var(--border)", color: "var(--text-2)" }}>
+                  Reopen
+                </button>
               )}
             </div>
           </div>
           <div className="px-2 mt-1">
             <div className="flex items-center gap-2">
-              <div className="font-semibold text-white truncate">{report.report_name}</div>
-              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-slate-400 hover:text-white hover:bg-slate-800" onClick={() => setEditOpen(true)}>
+              <div className="font-semibold truncate" style={{ color: "var(--text-1)" }}>{report.report_name}</div>
+              <button onClick={() => setEditOpen(true)} className="h-7 w-7 shrink-0 flex items-center justify-center rounded-lg hover:opacity-80"
+                style={{ color: "var(--text-3)" }}>
                 <Settings className="w-4 h-4" />
-              </Button>
+              </button>
             </div>
-            <div className="text-xs text-slate-400 flex items-center gap-2 flex-wrap">
-              <span className="truncate">{report.site_name}</span>
-              <span>·</span><span className="font-mono text-amber-400">{report.site_code}</span>
+            <div className="text-xs flex items-center gap-2 flex-wrap" style={{ color: "var(--text-3)" }}>
+              <span className="truncate" style={{ color: "var(--text-2)" }}>{report.site_name}</span>
+              <span>·</span>
+              <span className="font-mono" style={{ color: "var(--mjw-gold)" }}>{report.site_code}</span>
               {report.planned_visit_date && <><span>·</span><span>Visit {report.planned_visit_date}</span></>}
               {report.status !== "active" && (
-                <span className="ml-1 px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 text-[10px] uppercase">{report.status}</span>
+                <span className="px-1.5 py-0.5 rounded text-[10px] uppercase" style={{ background: "var(--bg-card-2)", color: "var(--text-3)" }}>{report.status}</span>
               )}
             </div>
           </div>
@@ -280,10 +293,10 @@ function CapturePage() {
 
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
         {/* Summary */}
-        <Card className="p-4 bg-white border-slate-300 shadow-sm">
+        <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
           <div className="flex items-center justify-between mb-3">
-            <div className="text-sm font-semibold text-slate-900">Report summary</div>
-            <div className="text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">{report.report_type ?? "Site Visit"}</div>
+            <div className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>Report summary</div>
+            <div className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: "rgba(201,162,75,0.15)", color: "var(--mjw-gold)", border: "1px solid rgba(201,162,75,0.3)" }}>{report.report_type ?? "Site Visit"}</div>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             <Stat label="Areas" value={`${summary.completed}/${summary.total}`} />
@@ -294,23 +307,23 @@ function CapturePage() {
             <Stat label="Photos" value={summary.photos} />
           </div>
           {(report.planned_visit_date || report.due_date) && (
-            <div className="flex items-center gap-3 mt-3 text-xs text-slate-600">
-              {report.planned_visit_date && <span>Visit: <strong className="text-slate-900">{report.planned_visit_date}</strong></span>}
-              {report.due_date && <span>Due: <strong className="text-slate-900">{report.due_date}</strong></span>}
+            <div className="flex items-center gap-3 mt-3 text-xs" style={{ color: "var(--text-3)" }}>
+              {report.planned_visit_date && <span>Visit: <strong style={{ color: "var(--text-1)" }}>{report.planned_visit_date}</strong></span>}
+              {report.due_date && <span>Due: <strong style={{ color: "var(--text-1)" }}>{report.due_date}</strong></span>}
             </div>
           )}
-        </Card>
+        </div>
 
         {readOnly && (
-          <Card className="p-3 text-sm text-slate-600 bg-amber-50 border-amber-200">
+          <div className="p-3 text-sm rounded-xl border" style={{ background: "rgba(201,162,75,0.08)", borderColor: "rgba(201,162,75,0.3)", color: "var(--mjw-gold)" }}>
             This report is {report.status}. Reopen it to make changes.
-          </Card>
+          </div>
         )}
 
         {/* Sections */}
         <div className="space-y-3">
           {sections.length === 0 && (
-            <Card className="p-6 text-sm text-slate-500 text-center">No inspection areas yet.</Card>
+            <div className="p-6 text-sm text-center rounded-xl border" style={{ background: "var(--bg-card)", borderColor: "var(--border)", color: "var(--text-3)" }}>No inspection areas yet.</div>
           )}
           {[...sections].sort((a, b) => a.sort_order - b.sort_order).map((s) => (
             <SectionCard
@@ -332,9 +345,10 @@ function CapturePage() {
         </div>
 
         {!readOnly && (
-          <Button onClick={addAdHoc} variant="outline" className="w-full h-12 border-dashed border-slate-300">
-            <Plus className="w-4 h-4 mr-1" /> Add Ad Hoc Item
-          </Button>
+          <button onClick={addAdHoc} className="w-full h-12 rounded-xl border border-dashed text-sm font-medium flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+            style={{ borderColor: "var(--border)", color: "var(--text-3)" }}>
+            <Plus className="w-4 h-4" /> Add Ad Hoc Item
+          </button>
         )}
       </main>
 
@@ -365,12 +379,13 @@ function CapturePage() {
 }
 
 function Stat({ label, value, tone = "neutral" }: { label: string; value: number | string; tone?: "neutral" | "red" | "amber" }) {
-  const cls = tone === "red" ? "text-red-600" : tone === "amber" ? "text-amber-600" : "text-slate-900";
-  const bg = tone === "red" ? "bg-red-50 border-red-200" : tone === "amber" ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200";
+  const color = tone === "red" ? "#f87171" : tone === "amber" ? "var(--mjw-gold)" : "var(--text-1)";
+  const border = tone === "red" ? "rgba(248,113,113,0.2)" : tone === "amber" ? "rgba(201,162,75,0.2)" : "var(--border)";
+  const bg = tone === "red" ? "rgba(248,113,113,0.06)" : tone === "amber" ? "rgba(201,162,75,0.06)" : "var(--bg-card-2)";
   return (
-    <div className={`rounded-md border px-2 py-2 ${bg}`}>
-      <div className={`text-lg font-bold ${cls}`}>{value}</div>
-      <div className="text-[10px] uppercase tracking-wide text-slate-500 font-medium">{label}</div>
+    <div className="rounded-lg px-2 py-2" style={{ background: bg, border: `1px solid ${border}` }}>
+      <div className="text-lg font-bold" style={{ color }}>{value}</div>
+      <div className="text-[10px] uppercase tracking-wide font-medium" style={{ color: "var(--text-3)" }}>{label}</div>
     </div>
   );
 }
@@ -412,27 +427,30 @@ function SectionCard({ section, photos, urls, readOnly, expanded, onToggle, onPa
     }, 600);
   }
 
-  const statusBorder = section.status === "Needs Work" ? "border-l-4 border-l-red-400"
-    : section.repairs_required ? "border-l-4 border-l-amber-400"
-    : section.status === "Good" || section.status === "In Order" ? "border-l-4 border-l-emerald-400"
-    : section.status ? "border-l-4 border-l-slate-400"
-    : "border-l-4 border-l-slate-200";
+  const accentColor = section.status === "Needs Work" ? "#f87171"
+    : section.repairs_required ? "var(--mjw-gold)"
+    : section.status === "Good" || section.status === "In Order" ? "#4ade80"
+    : section.status ? "var(--text-3)"
+    : "var(--border)";
 
   return (
-    <Card className={`overflow-hidden shadow-sm ${statusBorder}`}>
-      <button type="button" onClick={onToggle} className="w-full flex items-center gap-2 px-3 py-3.5 text-left hover:bg-slate-50 active:bg-slate-100">
-        {expanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+    <div className="rounded-xl overflow-hidden" style={{ background: "var(--bg-card)", border: `1px solid var(--border)`, borderLeft: `4px solid ${accentColor}` }}>
+      <button type="button" onClick={onToggle} className="w-full flex items-center gap-2 px-3 py-3.5 text-left transition-colors"
+        style={{ background: "transparent" }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-card-2)")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+        {expanded ? <ChevronDown className="w-4 h-4 shrink-0" style={{ color: "var(--text-3)" }} /> : <ChevronRight className="w-4 h-4 shrink-0" style={{ color: "var(--text-3)" }} />}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <div className="font-bold text-slate-900 text-[15px] truncate">{section.area_name}</div>
-            {section.is_ad_hoc && <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] uppercase font-semibold">Ad hoc</span>}
+            <div className="font-semibold text-[15px] truncate" style={{ color: "var(--text-1)" }}>{section.area_name}</div>
+            {section.is_ad_hoc && <span className="px-1.5 py-0.5 rounded text-[10px] uppercase font-semibold" style={{ background: "rgba(201,162,75,0.12)", color: "var(--mjw-gold)" }}>Ad hoc</span>}
           </div>
-          <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
+          <div className="flex items-center gap-2 mt-1 text-[11px]" style={{ color: "var(--text-3)" }}>
             <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border ${tone.bg} ${tone.text} ${tone.border}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} /> {tone.label}
             </span>
             {section.repairs_required && (
-              <span className="inline-flex items-center gap-1 text-amber-700">
+              <span className="inline-flex items-center gap-1" style={{ color: "var(--mjw-gold)" }}>
                 <Wrench className="w-3 h-3" /> Repair{section.priority ? ` · ${section.priority}` : ""}
               </span>
             )}
@@ -443,7 +461,7 @@ function SectionCard({ section, photos, urls, readOnly, expanded, onToggle, onPa
       </button>
 
       {expanded && (
-        <div className="px-3 pb-3 space-y-3 border-t border-slate-100 pt-3">
+        <div className="px-3 pb-3 space-y-3 pt-3" style={{ borderTop: `1px solid var(--border)` }}>
           {/* Status */}
           <div>
             <Label className="text-xs">Status</Label>
@@ -453,7 +471,8 @@ function SectionCard({ section, photos, urls, readOnly, expanded, onToggle, onPa
                 const active = section.status === opt;
                 return (
                   <button key={opt} type="button" disabled={readOnly} onClick={() => onPatch({ status: opt })}
-                    className={`text-[10px] sm:text-xs px-1 py-2 rounded border text-center font-medium ${active ? `${t.bg} ${t.text} ${t.border}` : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}>
+                    className={`text-[10px] sm:text-xs px-1 py-2 rounded border text-center font-medium transition-opacity hover:opacity-90 ${active ? `${t.bg} ${t.text} ${t.border}` : ""}`}
+                    style={!active ? { background: "var(--bg-card-2)", color: "var(--text-2)", borderColor: "var(--border)" } : {}}>
                     {t.label}
                   </button>
                 );
@@ -482,7 +501,7 @@ function SectionCard({ section, photos, urls, readOnly, expanded, onToggle, onPa
           </div>
 
           {section.repairs_required && (
-            <div className="space-y-2 rounded-md border border-amber-200 bg-amber-50/40 p-3">
+            <div className="space-y-2 rounded-lg p-3" style={{ background: "rgba(201,162,75,0.06)", border: "1px solid rgba(201,162,75,0.2)" }}>
               <div>
                 <Label className="text-xs">Repair description</Label>
                 <Textarea rows={2} disabled={readOnly} value={repairDesc}
@@ -586,7 +605,7 @@ function SectionCard({ section, photos, urls, readOnly, expanded, onToggle, onPa
           )}
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 

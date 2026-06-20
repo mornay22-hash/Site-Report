@@ -1,9 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ChevronLeft, Building2 } from "lucide-react";
@@ -12,9 +8,7 @@ import { generateSiteCode } from "@/lib/site-code";
 import { REPORT_TYPES } from "@/lib/templates";
 import { BUILDINGS } from "@/lib/buildings";
 
-export const Route = createFileRoute("/new")({
-  component: NewReportPage,
-});
+export const Route = createFileRoute("/new")({ component: NewReportPage });
 
 function NewReportPage() {
   const navigate = useNavigate();
@@ -32,16 +26,11 @@ function NewReportPage() {
 
   function onBuildingSelect(value: string) {
     setSelectedBuilding(value);
-    if (value === "__custom__") {
-      setSiteName("");
-      setSiteCode("");
-      return;
-    }
+    if (value === "__custom__") { setSiteName(""); setSiteCode(""); return; }
     const b = BUILDINGS.find((b) => b.code === value);
     if (!b) return;
     setSiteName(b.name);
     setSiteCode(b.code);
-    // Auto-set report name if empty
     if (!reportName) {
       const month = new Date().toLocaleString("default", { month: "long", year: "numeric" });
       setReportName(`${b.name} — ${month}`);
@@ -58,8 +47,7 @@ function NewReportPage() {
     try {
       if (inspectorName.trim()) localStorage.setItem("mjw-inspector", inspectorName.trim());
       const report = await createReport({
-        report_name: rn,
-        site_name: sn,
+        report_name: rn, site_name: sn,
         site_code: siteCode.trim() || generateSiteCode(sn),
         planned_visit_date: plannedVisitDate || undefined,
         due_date: dueDate || undefined,
@@ -70,144 +58,149 @@ function NewReportPage() {
       navigate({ to: "/reports/$id", params: { id: report.id }, replace: true });
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to create report");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
   const isCustom = selectedBuilding === "__custom__" || selectedBuilding === "";
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-3xl mx-auto px-2 h-14 flex items-center">
+    <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
+      <header className="sticky top-0 z-10 border-b" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link to="/">
-            <Button variant="ghost" size="sm"><ChevronLeft className="w-4 h-4 mr-1" /> Back</Button>
+            <button className="flex items-center gap-1 text-sm px-2 py-1.5 rounded-lg transition-colors hover:opacity-80"
+              style={{ color: "var(--text-2)" }}>
+              <ChevronLeft className="w-4 h-4" /> Back
+            </button>
           </Link>
-          <div className="font-semibold text-slate-900 ml-2">New Site Visit Report</div>
+          <span className="font-semibold text-sm" style={{ color: "var(--text-1)" }}>New Site Visit Report</span>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-5">
-        <Card className="p-5 shadow-sm">
+        <div className="rounded-xl border p-5 space-y-5" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
           <form onSubmit={onSubmit} className="space-y-5">
 
             {/* Building selector */}
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
-                <Building2 className="w-4 h-4 text-amber-500" />
+              <label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "var(--text-1)" }}>
+                <Building2 className="w-4 h-4" style={{ color: "var(--mjw-gold)" }} />
                 Select building *
-              </Label>
-              <Select value={selectedBuilding} onValueChange={onBuildingSelect}>
-                <SelectTrigger className="h-11 bg-slate-50 border-slate-300 text-slate-900">
-                  <SelectValue placeholder="Choose a building…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BUILDINGS.map((b) => (
-                    <SelectItem key={b.code} value={b.code}>
-                      <span className="font-medium">{b.name}</span>
-                      <span className="ml-2 text-xs text-slate-500">{b.code}</span>
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="__custom__">
-                    <span className="text-slate-500 italic">Enter manually…</span>
+              </label>
+              <DarkSelect value={selectedBuilding} onValueChange={onBuildingSelect} placeholder="Choose a building…">
+                {BUILDINGS.map((b) => (
+                  <SelectItem key={b.code} value={b.code}>
+                    <span>{b.name}</span>
+                    <span className="ml-2 text-xs opacity-50">{b.code}</span>
                   </SelectItem>
-                </SelectContent>
-              </Select>
+                ))}
+                <SelectItem value="__custom__"><span className="opacity-50 italic">Enter manually…</span></SelectItem>
+              </DarkSelect>
             </div>
 
-            {/* Site name + code — shown always but readonly when building selected */}
+            {/* Site name + code */}
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2 space-y-1.5">
-                <Label className="text-xs text-slate-600">Site / building name *</Label>
-                <Input
-                  value={siteName}
+                <DarkLabel>Site / building name *</DarkLabel>
+                <DarkInput value={siteName} readOnly={!isCustom}
                   onChange={(e) => { setSiteName(e.target.value); if (isCustom && !siteCode) setSiteCode(generateSiteCode(e.target.value)); }}
-                  readOnly={!isCustom}
-                  className={!isCustom ? "bg-slate-50 text-slate-600" : ""}
-                  required
-                />
+                  required />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs text-slate-600">Site code</Label>
-                <Input
-                  value={siteCode}
-                  onChange={(e) => setSiteCode(e.target.value.toUpperCase())}
-                  readOnly={!isCustom}
-                  className={`font-mono ${!isCustom ? "bg-slate-50 text-slate-600" : ""}`}
-                  maxLength={8}
-                />
+                <DarkLabel>Site code</DarkLabel>
+                <DarkInput value={siteCode} readOnly={!isCustom} className="font-mono"
+                  onChange={(e) => setSiteCode(e.target.value.toUpperCase())} maxLength={8} />
               </div>
             </div>
 
-            <Divider />
+            <div className="border-t" style={{ borderColor: "var(--border)" }} />
 
             {/* Report name */}
-            <Field label="Report name *">
-              <Input
-                value={reportName}
-                onChange={(e) => setReportName(e.target.value)}
-                placeholder="e.g. June 2026 Monthly Inspection"
-                required
-              />
-            </Field>
+            <div className="space-y-1.5">
+              <DarkLabel>Report name *</DarkLabel>
+              <DarkInput value={reportName} onChange={(e) => setReportName(e.target.value)}
+                placeholder="e.g. June 2026 Monthly Inspection" required />
+            </div>
 
             {/* Dates */}
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Planned visit date">
-                <Input type="date" value={plannedVisitDate} onChange={(e) => setPlannedVisitDate(e.target.value)} />
-              </Field>
-              <Field label="Due date">
-                <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-              </Field>
+              <div className="space-y-1.5">
+                <DarkLabel>Planned visit date</DarkLabel>
+                <DarkInput type="date" value={plannedVisitDate} onChange={(e) => setPlannedVisitDate(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <DarkLabel>Due date</DarkLabel>
+                <DarkInput type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+              </div>
             </div>
 
-            {/* Report type — full width, no overlap */}
-            <Field label="Report type">
-              <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger className="h-11 w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper" sideOffset={4}>
-                  {REPORT_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+            {/* Report type */}
+            <div className="space-y-1.5">
+              <DarkLabel>Report type</DarkLabel>
+              <DarkSelect value={reportType} onValueChange={setReportType}>
+                {REPORT_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </DarkSelect>
+            </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Area / section (optional)">
-                <Input value={area} onChange={(e) => setArea(e.target.value)} placeholder="e.g. North Block" />
-              </Field>
-              <Field label="Inspector name">
-                <Input value={inspectorName} onChange={(e) => setInspectorName(e.target.value)} placeholder="Your name" />
-              </Field>
+              <div className="space-y-1.5">
+                <DarkLabel>Area / section (optional)</DarkLabel>
+                <DarkInput value={area} onChange={(e) => setArea(e.target.value)} placeholder="e.g. North Block" />
+              </div>
+              <div className="space-y-1.5">
+                <DarkLabel>Inspector name</DarkLabel>
+                <DarkInput value={inspectorName} onChange={(e) => setInspectorName(e.target.value)} placeholder="Your name" />
+              </div>
             </div>
 
-            <p className="text-xs text-slate-500 bg-slate-50 rounded-md px-3 py-2 border border-slate-200">
-              ✓ 12 standard inspection areas preloaded · Works fully offline — no signal needed
+            <p className="text-xs px-3 py-2 rounded-lg" style={{ background: "var(--bg-card-2)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
+              ✓ 12 standard inspection areas preloaded · Works fully offline
             </p>
 
-            <Button type="submit" disabled={loading} className="w-full h-12 text-base bg-slate-900 hover:bg-slate-800">
+            <button type="submit" disabled={loading}
+              className="w-full h-12 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: "var(--accent)", color: "#fff" }}>
               {loading ? "Creating…" : "Create report"}
-            </Button>
+            </button>
           </form>
-        </Card>
+        </div>
       </main>
     </div>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function DarkLabel({ children }: { children: React.ReactNode }) {
+  return <label className="text-xs font-medium" style={{ color: "var(--text-2)" }}>{children}</label>;
+}
+
+function DarkInput({ className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-slate-700">{label}</Label>
-      {children}
-    </div>
+    <input
+      {...props}
+      className={`w-full h-10 px-3 rounded-lg text-sm outline-none transition-colors focus:ring-1 read-only:opacity-60 ${className}`}
+      style={{
+        background: "var(--bg-card-2)",
+        border: "1px solid var(--border)",
+        color: "var(--text-1)",
+        colorScheme: "dark",
+      }}
+    />
   );
 }
 
-function Divider() {
-  return <div className="border-t border-slate-200" />;
+function DarkSelect({ value, onValueChange, placeholder, children }: {
+  value: string; onValueChange: (v: string) => void; placeholder?: string; children: React.ReactNode;
+}) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="h-10 w-full rounded-lg border text-sm"
+        style={{ background: "var(--bg-card-2)", borderColor: "var(--border)", color: value ? "var(--text-1)" : "var(--text-3)" }}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent position="popper" sideOffset={4}
+        style={{ background: "var(--bg-card)", borderColor: "var(--border)", color: "var(--text-1)" }}>
+        {children}
+      </SelectContent>
+    </Select>
+  );
 }
