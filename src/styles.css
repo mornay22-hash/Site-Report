@@ -1,0 +1,161 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * MJW Design System
+ * Premium dark editorial-operator aesthetic.
+ * Tagline: "No Noise. Just Signal."
+ *
+ * Backgrounds are always near-black. Gold (#C9A24B) is the only "hot"
+ * accent. Blue is reserved for secondary info. Slate utilities are
+ * remapped to dark MJW surfaces so existing components stay on-brand
+ * without per-class rewrites.
+ */
+
+:root {
+  --mjw-black:   #04060C;
+  --mjw-ink:     #070B15;
+  --mjw-ink2:    #0A1020;
+  --mjw-ink3:    #0F1728;
+  --mjw-gold:    #C9A24B;
+  --mjw-gold-lt: #EAD08A;
+  --mjw-gold-dk: #9A7A2E;
+  --mjw-blue:    #2E4D8F;
+  --mjw-blue-lt: #5A7FD6;
+  --mjw-paper:   #ECE8DD;
+  --mjw-slate:   #79839B;
+  --mjw-slate-dk:#4A5266;
+  --mjw-line:    rgba(236,232,221,.08);
+  --mjw-line2:   rgba(236,232,221,.04);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Fonts */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Remap default tailwind palette utilities (bg-white, bg-slate-*, text-slate-*,
+     border-slate-*, bg-amber-*) to MJW dark surfaces so existing components
+     adopt the brand without rewriting every className. */
+  --color-white: var(--mjw-ink2);
+  --color-black: var(--mjw-paper);
+
+  --color-slate-50:  var(--mjw-black);
+  --color-slate-100: var(--mjw-ink);
+  --color-slate-200: var(--mjw-line);
+  --color-slate-300: var(--mjw-line);
+  --color-slate-400: var(--mjw-slate-dk);
+  --color-slate-500: var(--mjw-slate);
+  --color-slate-600: var(--mjw-slate);
+  --color-slate-700: var(--mjw-paper);
+  --color-slate-800: var(--mjw-gold-dk);
+  --color-slate-900: var(--mjw-paper);
+
+  --color-amber-50:  var(--mjw-ink3);
+  --color-amber-100: var(--mjw-ink3);
+  --color-amber-200: var(--mjw-gold-dk);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: var(--mjw-black);
+  --foreground: var(--mjw-paper);
+  --card: var(--mjw-ink2);
+  --card-foreground: var(--mjw-paper);
+  --popover: var(--mjw-ink2);
+  --popover-foreground: var(--mjw-paper);
+  --primary: var(--mjw-gold);
+  --primary-foreground: var(--mjw-black);
+  --secondary: var(--mjw-ink3);
+  --secondary-foreground: var(--mjw-paper);
+  --muted: var(--mjw-ink3);
+  --muted-foreground: var(--mjw-slate);
+  --accent: var(--mjw-ink3);
+  --accent-foreground: var(--mjw-gold-lt);
+  --destructive: #B5443A;
+  --destructive-foreground: var(--mjw-paper);
+  --border: var(--mjw-line);
+  --input: var(--mjw-line);
+  --ring: var(--mjw-gold);
+  --chart-1: var(--mjw-gold);
+  --chart-2: var(--mjw-blue-lt);
+  --chart-3: var(--mjw-gold-lt);
+  --chart-4: var(--mjw-blue);
+  --chart-5: var(--mjw-slate);
+  --sidebar: var(--mjw-ink);
+  --sidebar-foreground: var(--mjw-paper);
+  --sidebar-primary: var(--mjw-gold);
+  --sidebar-primary-foreground: var(--mjw-black);
+  --sidebar-accent: var(--mjw-ink3);
+  --sidebar-accent-foreground: var(--mjw-gold-lt);
+  --sidebar-border: var(--mjw-line);
+  --sidebar-ring: var(--mjw-gold);
+}
+
+.dark {
+  /* MJW is always dark — no separate dark theme needed. */
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--mjw-black);
+    color: var(--mjw-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+}

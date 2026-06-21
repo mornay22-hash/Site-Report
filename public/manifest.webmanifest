@@ -1,0 +1,25 @@
+{
+  "name": "MJW Site Report",
+  "short_name": "MJW Site",
+  "description": "MJW Site Report — on-site inspection capture, works offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
+  "icons": [
+    {
+      "src": "/__l5e/assets-v1/6e42a8e1-8044-4413-9fd4-65e7d092c146/mjw-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/__l5e/assets-v1/6e42a8e1-8044-4413-9fd4-65e7d092c146/mjw-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
