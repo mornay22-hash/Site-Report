@@ -2,11 +2,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ChevronLeft, Building2 } from "lucide-react";
+import { ChevronLeft, Building2, BookMarked } from "lucide-react";
 import { createReport } from "@/lib/repo";
+import { syncReports } from "@/lib/sync";
 import { generateSiteCode } from "@/lib/site-code";
 import { REPORT_TYPES } from "@/lib/templates";
 import { BUILDINGS } from "@/lib/buildings";
+import { loadTemplates, saveTemplate, resolveTemplateName, type SavedTemplate } from "@/lib/report-templates";
 
 export const Route = createFileRoute("/new")({ component: NewReportPage });
 
@@ -23,9 +25,28 @@ function NewReportPage() {
   const [area, setArea] = useState("");
   const [inspectorName, setInspectorName] = useState(() => localStorage.getItem("mjw-inspector") ?? "");
   const [loading, setLoading] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [templateAreas, setTemplateAreas] = useState<string[]>([]);
+
+  const templates = loadTemplates();
+
+  function applyTemplate(t: SavedTemplate) {
+    setSiteName(t.site_name);
+    setSiteCode(t.site_code);
+    setReportType(t.report_type);
+    setArea(t.area);
+    setInspectorName(t.inspector_name);
+    setSelectedBuilding("__custom__");
+    setTemplateAreas(t.areas ?? []);
+    if (t.report_name_pattern) {
+      setReportName(resolveTemplateName(t.report_name_pattern, t.site_name));
+    }
+  }
 
   function onBuildingSelect(value: string) {
     setSelectedBuilding(value);
+    setTemplateAreas([]);
     if (value === "__custom__") { setSiteName(""); setSiteCode(""); return; }
     const b = BUILDINGS.find((b) => b.code === value);
     if (!b) return;
@@ -54,11 +75,31 @@ function NewReportPage() {
         report_type: reportType,
         area: area.trim() || undefined,
         inspector_name: inspectorName.trim() || undefined,
+        template_areas: templateAreas.length ? templateAreas : undefined,
       });
+      syncReports().catch(() => {});
       navigate({ to: "/reports/$id", params: { id: report.id }, replace: true });
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to create report");
     } finally { setLoading(false); }
+  }
+
+  function handleSaveTemplate() {
+    const tn = templateName.trim();
+    if (!tn) return toast.error("Template name is required");
+    if (!siteName.trim()) return toast.error("Site name is required to save a template");
+    saveTemplate({
+      name: tn,
+      site_name: siteName.trim(),
+      site_code: siteCode.trim() || generateSiteCode(siteName),
+      report_type: reportType,
+      report_name_pattern: reportName.trim(),
+      area: area.trim(),
+      inspector_name: inspectorName.trim(),
+    });
+    toast.success(`Template "${tn}" saved`);
+    setTemplateName("");
+    setShowSaveTemplate(false);
   }
 
   const isCustom = selectedBuilding === "__custom__" || selectedBuilding === "";
@@ -77,7 +118,27 @@ function NewReportPage() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-5">
+      <main className="max-w-3xl mx-auto px-4 py-5 space-y-4">
+
+        {/* Template selector */}
+        {templates.length > 0 && (
+          <div className="rounded-xl border p-4 space-y-2" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+            <div className="flex items-center gap-2 mb-1">
+              <BookMarked className="w-4 h-4" style={{ color: "var(--mjw-gold)" }} />
+              <span className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>Load from Template</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {templates.map((t) => (
+                <button key={t.id} onClick={() => applyTemplate(t)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-opacity hover:opacity-80"
+                  style={{ background: "var(--bg-card-2)", borderColor: "var(--border)", color: "var(--text-2)" }}>
+                  {t.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="rounded-xl border p-5 space-y-5" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
           <form onSubmit={onSubmit} className="space-y-5">
 
@@ -119,7 +180,7 @@ function NewReportPage() {
             <div className="space-y-1.5">
               <DarkLabel>Report name *</DarkLabel>
               <DarkInput value={reportName} onChange={(e) => setReportName(e.target.value)}
-                placeholder="e.g. June 2026 Monthly Inspection" required />
+                placeholder="e.g. Laguna Mall - July 2026 (Night Report)" required />
             </div>
 
             {/* Dates */}
@@ -154,7 +215,11 @@ function NewReportPage() {
             </div>
 
             <p className="text-xs px-3 py-2 rounded-lg" style={{ background: "var(--bg-card-2)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
-              ✓ 12 standard inspection areas preloaded · Works fully offline
+              {templateAreas.length > 0
+                ? `✓ ${templateAreas.length} areas will be loaded from template · Works fully offline`
+                : reportType === "Monthly Inspection"
+                  ? "✓ 12 standard inspection areas will be preloaded · Works fully offline"
+                  : "✓ No preloaded areas — add your own during the inspection · Works fully offline"}
             </p>
 
             <button type="submit" disabled={loading}
@@ -163,6 +228,35 @@ function NewReportPage() {
               {loading ? "Creating…" : "Create report"}
             </button>
           </form>
+
+          {/* Save as template */}
+          <div className="border-t pt-4" style={{ borderColor: "var(--border)" }}>
+            {!showSaveTemplate ? (
+              <button onClick={() => setShowSaveTemplate(true)}
+                className="w-full h-9 rounded-lg text-xs font-medium border flex items-center justify-center gap-1.5 hover:opacity-80 transition-opacity"
+                style={{ borderColor: "var(--border)", color: "var(--text-3)", background: "transparent" }}>
+                <BookMarked className="w-3.5 h-3.5" /> Save current settings as Template
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <DarkLabel>Template name</DarkLabel>
+                <div className="flex gap-2">
+                  <DarkInput value={templateName} onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="e.g. Laguna Mall Night Report" className="flex-1" />
+                  <button onClick={handleSaveTemplate}
+                    className="h-10 px-4 rounded-lg text-xs font-semibold"
+                    style={{ background: "var(--accent)", color: "#fff" }}>
+                    Save
+                  </button>
+                  <button onClick={() => setShowSaveTemplate(false)}
+                    className="h-10 px-3 rounded-lg text-xs border"
+                    style={{ borderColor: "var(--border)", color: "var(--text-3)", background: "transparent" }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>

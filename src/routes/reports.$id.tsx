@@ -21,6 +21,7 @@ import {
   addPhoto, deletePhoto, getPhotoUrl,
 } from "@/lib/repo";
 import { generateReportPdf, downloadBlob } from "@/lib/pdf";
+import { syncReports } from "@/lib/sync";
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, REPORT_TYPES, statusTone, slugifyArea } from "@/lib/templates";
 import type { ReportRow, SectionRow, PhotoRow } from "@/lib/db";
 
@@ -89,7 +90,8 @@ function CapturePage() {
 
   async function saveSection(sectionId: string, patch: Partial<SectionRow>) {
     await patchSection(sectionId, patch);
-    void load();
+    // Update local state only — avoids a full reload that would steal keyboard focus on mobile
+    setSections((prev) => prev.map((s) => s.id === sectionId ? { ...s, ...patch } : s));
   }
 
   async function delSection(s: SectionRow) {
@@ -161,6 +163,7 @@ function CapturePage() {
     setFinishOpen(false);
     toast.success("Report completed");
     void load();
+    syncReports().catch(() => {});
   }
 
   async function reopenReport() {
@@ -168,6 +171,7 @@ function CapturePage() {
     await setReportStatus(report.id, "active");
     toast.success("Report reopened");
     void load();
+    syncReports().catch(() => {});
   }
 
   async function downloadPdf() {
@@ -662,6 +666,7 @@ function EditReportDialog({ open, onOpenChange, report, onSaved }: {
       toast.success("Report saved");
       await onSaved();
       onOpenChange(false);
+      syncReports().catch(() => {});
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to save");
     } finally {

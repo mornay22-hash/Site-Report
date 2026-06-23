@@ -29,6 +29,7 @@ export async function createReport(input: {
   report_type?: string;
   area?: string;
   inspector_name?: string;
+  template_areas?: string[]; // custom preset areas from a saved template
 }): Promise<ReportRow> {
   const d = await db();
   const now = new Date().toISOString();
@@ -56,10 +57,16 @@ export async function createReport(input: {
   };
   await d.put("reports", row);
 
-  // Preload standard inspection areas
+  // Preload areas: template_areas take priority; Monthly Inspection falls back to DEFAULT_AREAS
+  const areasToLoad = input.template_areas?.length
+    ? input.template_areas
+    : (input.report_type || "").trim() === "Monthly Inspection"
+      ? DEFAULT_AREAS
+      : [];
+  if (!areasToLoad.length) return row;
   const tx = d.transaction("sections", "readwrite");
-  for (let i = 0; i < DEFAULT_AREAS.length; i++) {
-    const name = DEFAULT_AREAS[i];
+  for (let i = 0; i < areasToLoad.length; i++) {
+    const name = areasToLoad[i];
     const sec: SectionRow = {
       id: newId("sec"),
       report_id: id,
@@ -84,6 +91,29 @@ export async function createReport(input: {
   }
   await tx.done;
   return row;
+}
+
+export async function deleteReport(id: string) {
+  const d = await db();
+  // Delete all sections and their photos/blobs
+  const sections = await d.getAllFromIndex("sections", "by-report", id);
+  for (const s of sections) {
+    const photos = await d.getAllFromIndex("photos", "by-section", s.id);
+    for (const p of photos) {
+      await d.delete("photos", p.id);
+      if (p._blobKey) await d.delete("photo_blobs", p._blobKey);
+    }
+    await d.delete("sections", s.id);
+  }
+  // Delete any report-level photos not linked to a section
+  const allPhotos = await d.getAllFromIndex("photos", "by-report", id);
+  for (const p of allPhotos) {
+    await d.delete("photos", p.id);
+    if (p._blobKey) await d.delete("photo_blobs", p._blobKey);
+  }
+  await d.delete("reports", id);
+  // Soft-delete in cloud (fire and forget) — imported lazily to avoid circular
+  import("./sync").then(({ cloudDeleteReport }) => cloudDeleteReport(id).catch(() => {})).catch(() => {});
 }
 
 export async function patchReport(id: string, patch: Partial<ReportRow>) {
