@@ -96,6 +96,7 @@ function NewReportPage() {
       report_name_pattern: reportName.trim(),
       area: area.trim(),
       inspector_name: inspectorName.trim(),
+      areas: templateAreas,
     });
     toast.success(`Template "${tn}" saved`);
     setTemplateName("");
